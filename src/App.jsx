@@ -214,7 +214,7 @@ export default function App() {
       <div className="map-background"><RealMap parcels={visibleParcels} selected={selected} region={region} onSelect={handleSelectParcel} baseLayer={baseLayer} apiKey={key} mapMode={mapMode} /></div>
 
       <header className="app-header">
-        <div className="product-brand"><span className="brand-logo"><Icon name="map" size={25}/></span><div><strong>울주 AI 농지변화 모니터링</strong><small>ULJU SMART FIELD · 정책연구 시연</small></div></div>
+        <div className="product-brand"><span className="brand-logo"><Icon name="map" size={25}/></span><div><strong>울주 AI 불법성토 모니터링</strong><small>프로일잘러의 업무 혁신 정책 연구단</small></div></div>
         <nav className="header-actions" aria-label="서비스 메뉴"><span className="demo-mark">DEMO · 가상 데이터</span><button className="header-help" onClick={() => setShowGuide(true)}><Icon name="help" size={17}/> 시연 안내</button></nav>
       </header>
 
