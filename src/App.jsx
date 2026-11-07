@@ -1,16 +1,47 @@
 import { useMemo, useState } from 'react';
 import RealMap from './RealMap';
+import RoadViewDemo from './RoadViewDemo';
 import './App.css';
 
-// 전부 시연용 가상 데이터입니다. 표기 위치는 해당 읍·면 인근의 예시 좌표이며 실제 필지가 아닙니다.
+// 모든 좌표·분석값은 정책연구 발표를 위한 예시이며 실제 필지나 탐지 결과가 아닙니다.
+// 12개 읍·면 전반에 표시하는 30개 가상 후보 중 2개만 상세 시연 대상으로 구분합니다.
 const SAMPLE_PARCELS = [
-  { id: 'DEMO-SN-01', region: '삼남읍', name: '시연 필지 A', lat: 35.5580, lng: 129.1170, risk: '높음', riskKey: 'high', change: 34.8, area: 420, permit: '행정자료 미연계', complaint: '모의 민원 1건', status: '미배정', note: '영상에서 식생 감소와 토양 노출 증가가 관찰되는 상황을 가정한 예시입니다.' },
-  { id: 'DEMO-SN-02', region: '삼남읍', name: '시연 필지 B', lat: 35.5520, lng: 129.1240, risk: '보통', riskKey: 'medium', change: 19.2, area: 275, permit: '행정자료 미연계', complaint: '없음', status: '점검 예정', note: '농작업이나 수확에 따른 변화 가능성이 있어 현장 확인이 필요한 예시입니다.' },
-  { id: 'DEMO-SN-03', region: '삼남읍', name: '시연 필지 C', lat: 35.5640, lng: 129.1100, risk: '낮음', riskKey: 'low', change: 8.7, area: 98, permit: '행정자료 미연계', complaint: '없음', status: '점검 완료', note: '작은 표면 색상 변화가 나타나는 상황을 가정했습니다.' },
-  { id: 'DEMO-OY-01', region: '온양읍', name: '시연 필지 A', lat: 35.4200, lng: 129.2810, risk: '높음', riskKey: 'high', change: 41.3, area: 510, permit: '행정자료 미연계', complaint: '모의 민원 1건', status: '미배정', note: '큰 토양 노출 영역이 나타난 상황을 가정한 예시입니다. 성토로 확정된 것은 아닙니다.' },
-  { id: 'DEMO-OY-02', region: '온양읍', name: '시연 필지 B', lat: 35.4260, lng: 129.2750, risk: '보통', riskKey: 'medium', change: 22.1, area: 305, permit: '행정자료 미연계', complaint: '없음', status: '점검 예정', note: '변화가 있지만 정상적인 농지 정비일 가능성도 있는 예시입니다.' },
-  { id: 'DEMO-OY-03', region: '온양읍', name: '시연 필지 C', lat: 35.4120, lng: 129.2900, risk: '낮음', riskKey: 'low', change: 11.4, area: 140, permit: '행정자료 미연계', complaint: '없음', status: '미배정', note: '농지 표면 색상 변화만 관찰되는 가상 사례입니다.' },
+  { id: 'DEMO-SN-01', region: '삼남읍', name: '대표 사례 A', lat: 35.5580, lng: 129.1170, risk: '높음', riskKey: 'high', change: 34.8, area: 420, permit: '행정자료 미연계', complaint: '모의 민원 1건', status: '미배정', featured: true, note: '식생 감소와 토양 노출이 증가했다고 가정한 시연 사례입니다. 영상 변화는 확인 대상의 후보 신호이며 성토 여부를 의미하지 않습니다.' },
+  { id: 'DEMO-SN-02', region: '삼남읍', name: '가상 변화 후보 02', lat: 35.5520, lng: 129.1240, risk: '보통', riskKey: 'medium', change: 19.2, area: 275, permit: '행정자료 미연계', complaint: '없음', status: '점검 예정', note: '경작 활동이나 수확으로 인한 변화일 수 있는 가상 사례입니다.' },
+  { id: 'DEMO-SN-03', region: '삼남읍', name: '가상 변화 후보 03', lat: 35.5640, lng: 129.1100, risk: '낮음', riskKey: 'low', change: 8.7, area: 98, permit: '행정자료 미연계', complaint: '없음', status: '점검 완료', note: '토양 색상 변화가 소규모로 나타났다고 가정한 가상 사례입니다.' },
+  { id: 'DEMO-OY-01', region: '온양읍', name: '대표 사례 B', lat: 35.4200, lng: 129.2810, risk: '높음', riskKey: 'high', change: 41.3, area: 510, permit: '행정자료 미연계', complaint: '모의 민원 1건', status: '미배정', featured: true, note: '넓은 면적의 토지피복 변화가 나타났다고 가정한 시연 사례입니다. 위법 여부와 성토 높이는 현장조사로 확인해야 합니다.' },
+  { id: 'DEMO-OY-02', region: '온양읍', name: '가상 변화 후보 05', lat: 35.4260, lng: 129.2750, risk: '보통', riskKey: 'medium', change: 22.1, area: 305, permit: '행정자료 미연계', complaint: '없음', status: '점검 예정', note: '농지 정비와 구별이 필요한 가상 사례입니다.' },
+  { id: 'DEMO-OY-03', region: '온양읍', name: '가상 변화 후보 06', lat: 35.4120, lng: 129.2900, risk: '낮음', riskKey: 'low', change: 11.4, area: 140, permit: '행정자료 미연계', complaint: '없음', status: '미배정', note: '표면 색상 변화만 관찰되는 가상 사례입니다.' },
 ];
+
+// 읍·면 인근에 임의로 분산한 시각화용 기준점 (필지 경계·지번·실제 위험 구역 아님).
+const EXTRA_DEMO_POINTS = [
+  ['범서읍', 35.573, 129.229, 'high'], ['범서읍', 35.553, 129.252, 'medium'], ['범서읍', 35.595, 129.221, 'low'],
+  ['언양읍', 35.580, 129.134, 'medium'], ['언양읍', 35.569, 129.152, 'high'], ['언양읍', 35.592, 129.146, 'low'],
+  ['온산읍', 35.449, 129.323, 'high'], ['온산읍', 35.430, 129.345, 'medium'], ['온산읍', 35.466, 129.311, 'low'],
+  ['청량읍', 35.496, 129.280, 'medium'], ['청량읍', 35.477, 129.294, 'high'], ['청량읍', 35.513, 129.270, 'low'],
+  ['웅촌면', 35.467, 129.209, 'medium'], ['웅촌면', 35.445, 129.229, 'high'],
+  ['서생면', 35.355, 129.318, 'high'], ['서생면', 35.330, 129.334, 'low'],
+  ['상북면', 35.606, 129.073, 'high'], ['상북면', 35.622, 129.095, 'medium'],
+  ['두동면', 35.661, 129.211, 'medium'], ['두동면', 35.680, 129.191, 'low'],
+  ['두서면', 35.648, 129.111, 'high'], ['두서면', 35.671, 129.084, 'medium'],
+  ['삼동면', 35.521, 129.176, 'high'], ['삼동면', 35.506, 129.160, 'low'],
+];
+
+const RISK_NAMES = { high: '높음', medium: '보통', low: '낮음' };
+EXTRA_DEMO_POINTS.forEach(([region, lat, lng, riskKey], index) => {
+  const seq = index + 7;
+  const change = Number((riskKey === 'high' ? 28 + (seq % 6) * 2.4 : riskKey === 'medium' ? 16 + (seq % 5) * 2.1 : 6 + (seq % 4) * 1.9).toFixed(1));
+  SAMPLE_PARCELS.push({
+    id: `DEMO-UL-${String(seq).padStart(2, '0')}`, region, name: `가상 변화 후보 ${String(seq).padStart(2, '0')}`,
+    lat, lng, risk: RISK_NAMES[riskKey], riskKey, change, area: 100 + (seq * 43) % 490,
+    permit: '행정자료 미연계', complaint: '모의 이력 없음', status: seq % 3 === 0 ? '점검 예정' : '미배정',
+    note: '토지피복 변화가 관찰되었다고 가정한 시각화용 자료입니다. 실제 조사 결과가 아닙니다.',
+  });
+});
+
+const REGIONS = ['전체', '범서읍', '언양읍', '온산읍', '온양읍', '청량읍', '삼남읍', '상북면', '서생면', '웅촌면', '두동면', '두서면', '삼동면'];
+const FEATURED_IDS = ['DEMO-SN-01', 'DEMO-OY-01'];
 
 const priorityOrder = { high: 0, medium: 1, low: 2 };
 
@@ -96,24 +127,44 @@ function CompareField({ parcel }) {
 }
 
 function ParcelDetail({ parcel, onClose, onStatusUpdate, status, onOpenGuide }) {
-  const [tab, setTab] = useState('compare');
+  const [tab, setTab] = useState('road');
   const [reportOpen, setReportOpen] = useState(false);
   return (
     <aside className="detail-drawer" aria-label="가상 필지 상세정보">
-      <div className="drawer-heading"><div><span className="drawer-eyebrow">변화 의심지역 · 모의 사례</span><h2>{parcel.region} {parcel.name}</h2><span className="parcel-code">{parcel.id}</span></div><button className="icon-button" onClick={onClose} aria-label="상세정보 닫기"><Icon name="close" size={20}/></button></div>
+      <div className="drawer-heading"><div><span className="drawer-eyebrow">★ 대표 상세 시연 · 가상 사례</span><h2>{parcel.region} {parcel.name}</h2><span className="parcel-code">{parcel.id}</span></div><button className="icon-button" onClick={onClose} aria-label="상세정보 닫기"><Icon name="close" size={20}/></button></div>
       <div className="drawer-scroll">
-        <div className="drawer-status"><RiskPill parcel={parcel}/><span className="status-chip">{status}</span><span className="data-note">좌표 · 분석값 모두 가상</span></div>
+        <div className="drawer-status"><RiskPill parcel={parcel}/><span className="status-chip">{status}</span><span className="data-note">촬영영상 아님 · 모의 수치</span></div>
         <div className="detail-stats"><div><span>토지피복 변화율</span><strong>{parcel.change}%</strong></div><div><span>변화 추정면적</span><strong>{parcel.area}<small>㎡</small></strong></div></div>
-        <div className="tab-group" role="tablist" aria-label="분석 화면">
+        <div className="tab-group feature-tabs" role="tablist" aria-label="대표 상세 시연 화면">
+          <button role="tab" aria-selected={tab === 'road'} className={tab === 'road' ? 'selected' : ''} onClick={() => setTab('road')}><Icon name="compass" size={15}/> 현장뷰</button>
           <button role="tab" aria-selected={tab === 'compare'} className={tab === 'compare' ? 'selected' : ''} onClick={() => setTab('compare')}><Icon name="image" size={15}/> 영상 비교</button>
           <button role="tab" aria-selected={tab === 'analysis'} className={tab === 'analysis' ? 'selected' : ''} onClick={() => setTab('analysis')}><Icon name="spark" size={15}/> AI 요약</button>
           <button role="tab" aria-selected={tab === 'checklist'} className={tab === 'checklist' ? 'selected' : ''} onClick={() => setTab('checklist')}><Icon name="clipboard" size={15}/> 점검관리</button>
         </div>
+        {tab === 'road' && <RoadViewDemo parcel={parcel} onNext={() => setTab('compare')}/>}
         {tab === 'compare' && <><CompareField key={parcel.id} parcel={parcel}/><div className="detail-data"><div><span>신고·허가 정보</span><b>{parcel.permit}</b></div><div><span>민원 이력</span><b>{parcel.complaint}</b></div></div><button className="action-primary" onClick={() => setTab('analysis')}><Icon name="spark" size={17}/> 모의 AI 분석 결과 보기 <Icon name="arrow" size={17}/></button></>}
         {tab === 'analysis' && <div className="content-panel"><div className="content-head"><Icon name="spark" size={18}/><b>사전 작성된 AI 요약 예시</b></div><p>{parcel.note}</p><ul><li>전·후영상 촬영 시점 및 동일 위치 여부 검토</li><li>신고·허가 이력과 현장 상황 대조</li><li>수확·경작·계절 변화에 따른 오탐 가능성 확인</li></ul><div className="inline-notice"><Icon name="info" size={16}/> 실제 생성형 AI를 호출하지 않은 시연 응답입니다.</div><button className="action-primary" onClick={() => {setTab('checklist');setReportOpen(true);}}><Icon name="file" size={17}/> 점검보고서 초안 보기 <Icon name="arrow" size={17}/></button></div>}
         {tab === 'checklist' && <div className="content-panel"><div className="content-head"><Icon name="clipboard" size={18}/><b>현장 확인 체크리스트</b></div><ul className="checklist"><li>영상의 촬영일과 위치 정합 여부 확인</li><li>농지개량 신고·허가 이력 조회</li><li>수확·경작 등 정상적 변화 여부 확인</li><li>필요 시 현장 방문 및 높이 측량</li></ul><div className="status-row"><span>점검 상태</span><strong>{status}</strong></div><button className="action-secondary" onClick={onStatusUpdate}><Icon name="check" size={17}/> 시연용 상태 변경</button><button className="action-primary" onClick={() => setReportOpen(v => !v)}><Icon name="file" size={17}/> {reportOpen ? '보고서 초안 닫기' : '보고서 초안 생성'} <Icon name="arrow" size={17}/></button>{reportOpen && <div className="report-draft"><span>AI 보고서 초안 · 사전 작성된 예시</span><strong>농지 변화 의심지역 현장점검 검토서</strong><p>대상: {parcel.region} {parcel.name} ({parcel.id})</p><p>관측: 토지피복 변화율 {parcel.change}%, 변화면적 추정 {parcel.area}㎡(모의 수치)</p><p>검토: 위성·항공영상 비교에서 변화가 표시되었으나 성토 및 위법 여부는 미확정.</p><p>권장: 허가·신고자료 대조 후 필요 시 현장 확인.</p><small>초안은 반드시 담당 공무원이 검토해야 합니다.</small></div>}</div>}
         <div className="drawer-footer"><Icon name="warning" size={17}/><p><strong>주의:</strong> 2D 영상만으로 성토 높이·토사 성분·위법 여부는 확정할 수 없습니다. 최종 확인은 공무원이 수행합니다.</p></div>
         <button className="text-link" onClick={onOpenGuide}><Icon name="help" size={15}/> 시연용 기능과 실제 연계의 차이 보기</button>
+      </div>
+    </aside>
+  );
+}
+
+function SpotSummary({ parcel, onClose, onShowcase }) {
+  return (
+    <aside className="detail-drawer summary-drawer" aria-label="일반 가상 핫스팟 요약">
+      <div className="drawer-heading"><div><span className="drawer-eyebrow">일반 가상 핫스팟 · 기본 정보</span><h2>{parcel.region} {parcel.name}</h2><span className="parcel-code">{parcel.id}</span></div><button className="icon-button" onClick={onClose} aria-label="요약 닫기"><Icon name="close" size={20}/></button></div>
+      <div className="drawer-scroll">
+        <div className="drawer-status"><RiskPill parcel={parcel}/><span className="status-chip">전역 현황용</span><span className="data-note">실제 탐지 결과 아님</span></div>
+        <div className="summary-banner"><Icon name="map" size={21}/><div><strong>가상 후보지 간단 조회</strong><p>지도 분포를 보여주기 위한 시연 데이터입니다. 이 지역에는 현장뷰·영상 비교·AI 보고서 기능을 구현하지 않았습니다.</p></div></div>
+        <div className="detail-stats"><div><span>가정한 토지피복 변화율</span><strong>{parcel.change}%</strong></div><div><span>가정한 변화면적</span><strong>{parcel.area}<small>㎡</small></strong></div></div>
+        <div className="content-panel"><div className="content-head"><Icon name="info" size={18}/><b>모의 조회 결과</b></div><p>{parcel.note}</p><p>인허가·민원 시스템 및 실제 영상 데이터와 연계되어 있지 않으며, 지도의 점 위치는 지번을 가리키지 않습니다.</p></div>
+        <div className="summary-next"><span>대표 상세 시연 보기</span><p>아래 두 사례에서 로드뷰형 현장 시점, 전후 비교, AI 요약과 보고서 초안을 체험할 수 있습니다.</p>
+          <div className="summary-quick-actions"><button onClick={() => onShowcase('DEMO-SN-01')}>삼남읍 대표 A →</button><button onClick={() => onShowcase('DEMO-OY-01')}>온양읍 대표 B →</button></div>
+        </div>
+        <div className="drawer-footer"><Icon name="warning" size={17}/><p>핫스팟 분포 및 수치는 예시이며, 불법 성토 여부는 판정할 수 없습니다.</p></div>
       </div>
     </aside>
   );
@@ -145,6 +196,7 @@ export default function App() {
   function handleSelectRegion(value) { setRegion(value); setSelectedId(null); }
   function handleSelectRisk(value) { setRisk(value); setSelectedId(null); }
   function handleSelectParcel(id) { setSelectedId(id); setShowPanel(true); }
+  function handleShowcase(id) { setRegion('전체'); setRisk('전체'); setKeyword(''); setSelectedId(id); setShowPanel(true); }
   function handleChangeStatus() {
     if (!selected) return;
     const current = statusOverrides[selected.id] || selected.status;
@@ -170,27 +222,34 @@ export default function App() {
 
       {!showPanel && <button className="panel-restore" onClick={() => setShowPanel(true)} aria-label="필지 목록 열기"><Icon name="search" size={18}/> 필지 목록 열기</button>}
       {showPanel && <aside className="left-panel">
-        <div className="panel-top"><div><span className="panel-kicker">실시간 지도가 아닌 시연용 분석</span><h1>의심지역 모니터링</h1><p>가상 필지를 선택하여 업무 흐름을 확인하세요.</p></div><button className="icon-button panel-hide" onClick={() => setShowPanel(false)} title="목록 숨기기"><Icon name="close" size={18}/></button></div>
+        <div className="panel-top"><div><span className="panel-kicker">실시간 지도가 아닌 시연용 분석</span><h1>울주군 전역 모니터링</h1><p>30개 분산 후보 · 대표 2곳에서 상세 시연</p></div><button className="icon-button panel-hide" onClick={() => setShowPanel(false)} title="목록 숨기기"><Icon name="close" size={18}/></button></div>
         <div className="stat-strip"><div><span>표시 후보</span><strong>{visibleParcels.length}<small>건</small></strong></div><div><span>높은 우선순위</span><strong>{highCount}<small>건</small></strong></div><div><span>미배정</span><strong>{unassigned}<small>건</small></strong></div></div>
         <div className="panel-content">
           <label className="search-field"><Icon name="search" size={18}/><input placeholder="필지명 또는 시연 ID 검색" value={keyword} onChange={e => {setKeyword(e.target.value);setSelectedId(null);}} aria-label="필지 검색" /></label>
           <div className="filter-caption"><Icon name="pin" size={15}/> 지역 선택</div>
           <div className="segmented-control">{['전체','삼남읍','온양읍'].map(r => <button key={r} className={region===r ? 'active' : ''} onClick={() => handleSelectRegion(r)}>{r}</button>)}</div>
+          <select className="all-region-select" value={region} onChange={e => handleSelectRegion(e.target.value)} aria-label="울주군 12개 읍면 중 지역 선택">
+            {REGIONS.map(r => <option key={r} value={r}>{r === '전체' ? '울주군 전역 (전체)' : r}</option>)}
+          </select>
           <div className="filter-caption"><Icon name="filter" size={15}/> 우선순위</div>
           <div className="risk-filter">{['전체','높음','보통','낮음'].map(item => <button key={item} className={risk===item ? 'active' : ''} onClick={() => handleSelectRisk(item)}>{item}</button>)}</div>
-          <div className="list-title"><strong>변화 의심 후보</strong><span>{visibleParcels.length}건 · 가상 사례</span></div>
-          <div className="parcel-list">{visibleParcels.map(parcel => <button key={parcel.id} className={`parcel-item ${selectedId === parcel.id ? 'selected' : ''}`} onClick={() => handleSelectParcel(parcel.id)}><span className={`parcel-marker-dot ${parcel.riskKey}`}/><span className="parcel-item-main"><strong>{parcel.region} {parcel.name}</strong><small>{parcel.id} · {statusOverrides[parcel.id] || parcel.status}</small></span><span className="parcel-item-side"><RiskPill parcel={parcel}/><small>변화 {parcel.change}%</small></span></button>)}{visibleParcels.length===0 && <div className="no-result">조건에 해당하는 가상 필지가 없습니다.</div>}</div>
+          <div className="showcase-card"><div className="showcase-heading"><Icon name="spark" size={16}/><strong>대표 상세 시연 2곳</strong><span>ROADVIEW DEMO</span></div><p>전역 핫스팟은 30곳, 정교한 상세 기능은 아래 두 곳에서만 시연합니다.</p><div className="showcase-choices">{FEATURED_IDS.map(id => { const p = SAMPLE_PARCELS.find(item => item.id === id); return <button key={id} onClick={() => handleShowcase(id)} className={selectedId === id ? 'chosen' : ''}><span>{p.region}</span><strong>{p.name}</strong><small>현장뷰 · AI · 보고서 →</small></button>; })}</div></div>
+          <div className="list-title"><strong>전체 변화 후보</strong><span>{visibleParcels.length}건 · 가상 사례</span></div>
+          <div className="parcel-list">{visibleParcels.map(parcel => <button key={parcel.id} className={`parcel-item ${selectedId === parcel.id ? 'selected' : ''}`} onClick={() => handleSelectParcel(parcel.id)}><span className={`parcel-marker-dot ${parcel.riskKey}`}/><span className="parcel-item-main"><strong>{parcel.region} {parcel.name} {parcel.featured && <span className="featured-mini">상세 시연</span>}</strong><small>{parcel.id} · {parcel.featured ? '전체 기능' : '기본 요약'} · {statusOverrides[parcel.id] || parcel.status}</small></span><span className="parcel-item-side"><RiskPill parcel={parcel}/><small>변화 {parcel.change}%</small></span></button>)}{visibleParcels.length===0 && <div className="no-result">조건에 해당하는 가상 필지가 없습니다.</div>}</div>
         </div>
-        <div className="left-panel-foot"><Icon name="info" size={16}/><span>실제 지도 위에 가상 필지 6건의 우선순위를 색상으로 표현했습니다. 실측 위험도 분석이 아닙니다.</span></div>
+        <div className="left-panel-foot"><Icon name="info" size={16}/><span>전역 30개 가상 좌표의 분포입니다. 상세 시연은 대표 2곳만 제공됩니다.</span></div>
       </aside>}
 
-      {!selected && <div className="welcome-float"><span className="welcome-icon"><Icon name="compass" size={20}/></span><div><strong>지도의 색상 영역을 클릭해 보세요</strong><small>붉은색일수록 높은 모의 우선순위 · 클릭하면 상세 분석 패널</small></div></div>}
-      {selected && <ParcelDetail key={selected.id} parcel={selected} status={statusOverrides[selected.id] || selected.status} onStatusUpdate={handleChangeStatus} onClose={() => setSelectedId(null)} onOpenGuide={() => setShowGuide(true)}/>}
-      {mapMode === 'heat' && !selected && <div className="hotspot-legend"><div className="hotspot-legend-head"><b>농지변화 핫스팟</b><span>DEMO</span></div><div className="hotspot-gradient"/><div className="hotspot-legend-labels"><span>낮음</span><span>보통</span><span>높음</span></div><p>6개 가상 필지의 모의 우선순위 표시<br/>실제 위험도·불법성토 분석 결과 아님</p></div>}
+      {!selected && <div className="welcome-float"><span className="welcome-icon"><Icon name="compass" size={20}/></span><div><strong>지도의 색상 영역을 클릭해 보세요</strong><small>전역 30곳은 기본 조회 · ★ 표시는 대표 상세 시연 2곳</small></div></div>}
+      {selected && (selected.featured
+        ? <ParcelDetail key={selected.id} parcel={selected} status={statusOverrides[selected.id] || selected.status} onStatusUpdate={handleChangeStatus} onClose={() => setSelectedId(null)} onOpenGuide={() => setShowGuide(true)}/>
+        : <SpotSummary key={selected.id} parcel={selected} onClose={() => setSelectedId(null)} onShowcase={handleShowcase}/>
+      )}
+      {mapMode === 'heat' && !selected && <div className="hotspot-legend"><div className="hotspot-legend-head"><b>농지변화 핫스팟</b><span>DEMO</span></div><div className="hotspot-gradient"/><div className="hotspot-legend-labels"><span>낮음</span><span>보통</span><span>높음</span></div><p>12개 읍·면 / 30개 가상 후보의 색상 분포<br/>실제 위험도·불법성토 분석 결과 아님</p></div>}
       <div className="map-disclaimer"><Icon name="info" size={15}/> 시연 화면 · 가상 위험도 분포 · 2D 영상으로 불법 여부·성토 높이 확정 불가 · 스카이뷰 미연계</div>
       {message && <div className="toast"><Icon name="info" size={16}/>{message}<button onClick={() => setMessage('')} aria-label="알림 닫기">×</button></div>}
 
-      {showGuide && <div className="dialog-overlay" onClick={() => setShowGuide(false)}><div className="guide-dialog" role="dialog" aria-modal="true" aria-label="발표용 시연 안내" onClick={e => e.stopPropagation()}><button className="icon-button guide-x" onClick={() => setShowGuide(false)} aria-label="닫기"><Icon name="close" size={19}/></button><span className="guide-eyebrow">2026 정책연구단 · 프로일잘러의 업무혁신</span><h2>3분 시연 순서</h2><ol><li>왼쪽에서 <b>삼남읍</b> 선택 → 실제 지도가 해당 지역으로 이동</li><li>지도에서 <b>붉은 핫스팟</b>을 클릭하거나 목록의 <b>시연 필지 A</b> 선택</li><li>오른쪽 패널에서 <b>전후영상 슬라이더</b> 이동</li><li><b>모의 AI 분석 결과 보기</b> → 체크리스트 확인</li><li><b>점검보고서 초안</b> 및 시연용 상태 변경</li></ol><div className="guide-warning"><Icon name="warning" size={18}/><span>실제 영상·허가·민원 DB, AI 모델, 울주 스카이맵·스카이뷰는 연결되지 않았습니다. 필지 위치 및 분석값은 모두 가상입니다.</span></div><button className="action-primary" onClick={() => setShowGuide(false)}>시연 시작하기 <Icon name="arrow" size={17}/></button></div></div>}
+      {showGuide && <div className="dialog-overlay" onClick={() => setShowGuide(false)}><div className="guide-dialog" role="dialog" aria-modal="true" aria-label="발표용 시연 안내" onClick={e => e.stopPropagation()}><button className="icon-button guide-x" onClick={() => setShowGuide(false)} aria-label="닫기"><Icon name="close" size={19}/></button><span className="guide-eyebrow">2026 정책연구단 · 프로일잘러의 업무혁신</span><h2>3분 시연 순서</h2><ol><li><b>울주군 전체 지도</b>에서 12개 읍·면의 30개 가상 핫스팟 분포 확인</li><li>일반 핫스팟을 눌러 <b>기본 요약</b>만 열리는 모습 시연</li><li>왼쪽 <b>대표 상세 시연</b>에서 삼남읍 또는 온양읍 선택</li><li><b>현장뷰</b> 좌우 이동 → <b>전후영상 슬라이더</b> 비교</li><li><b>모의 AI 요약</b> → 점검 체크리스트 → 보고서 초안</li></ol><div className="guide-warning"><Icon name="warning" size={18}/><span>실제 영상·허가·민원 DB, AI 모델, 울주 스카이맵·스카이뷰는 연결되지 않았습니다. 필지 위치 및 분석값은 모두 가상입니다.</span></div><button className="action-primary" onClick={() => setShowGuide(false)}>시연 시작하기 <Icon name="arrow" size={17}/></button></div></div>}
     </div>
   );
 }

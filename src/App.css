@@ -22,3 +22,60 @@
 .hotspot-legend p{border-top:1px solid #e8edf0;margin:11px 0 0;padding-top:9px;color:#82929e;font-size:10px;line-height:1.5}
 @media(max-width:790px){.hotspot-legend{right:10px;bottom:70px;padding:11px 12px;min-width:185px}.floating-toolbar{gap:2px}.floating-toolbar button{padding:7px 8px}}
 @media(max-width:560px){.hotspot-legend{display:none}.floating-toolbar{max-width:calc(100vw - 16px);right:8px;overflow-x:auto;scrollbar-width:none}.floating-toolbar::-webkit-scrollbar{display:none}.floating-toolbar button{font-size:10px;padding:7px 6px}.floating-toolbar .toolbar-separator{margin:5px 0}.floating-toolbar button svg{width:13px;height:13px}}
+
+/* 2026 정책연구 시연: 전역 30개 후보, 대표 2개 상세 시연 */
+.all-region-select{display:block;width:100%;margin-top:9px;border:1px solid #dce6ec;border-radius:8px;background:#fff;color:#46677c;padding:10px 12px;font-size:12px;font-weight:750;outline:0;cursor:pointer}
+.all-region-select:focus{border-color:#3587a0;box-shadow:0 0 0 3px #357e9d15}
+.showcase-card{margin-top:20px;border:1px solid #c5dee6;background:linear-gradient(145deg,#f4fbfd,#e9f4f7);border-radius:12px;padding:13px 11px;box-shadow:0 4px 11px #1c56730b}
+.showcase-heading{display:flex;align-items:center;gap:6px;color:#216582;font-size:12px}
+.showcase-heading span{margin-left:auto;font-size:8px;font-weight:850;letter-spacing:.05em;color:#19877f;background:#ddf2ec;padding:4px 5px;border-radius:4px}
+.showcase-card>p{color:#72909e;font-size:10px;line-height:1.6;margin:9px 0 11px}
+.showcase-choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.showcase-choices button{border:1px solid #cce1e8;background:#fff;color:#355c71;border-radius:9px;text-align:left;padding:10px 9px;display:flex;flex-direction:column;gap:4px;box-shadow:0 2px 5px #1c57730c;min-width:0}
+.showcase-choices button:hover,.showcase-choices button.chosen{border-color:#35869f;background:#f3fcfd}
+.showcase-choices button span{font-size:10px;color:#2b8b92;font-weight:800}
+.showcase-choices button strong{font-size:12px;white-space:nowrap}
+.showcase-choices button small{font-size:9px;color:#85a0ac;white-space:nowrap}
+.featured-mini{font-size:9px;font-weight:800;color:#19887e;background:#e5f4ee;border-radius:4px;padding:2px 4px;white-space:nowrap}
+.featured-marker-shell{background:transparent!important;border:0!important}
+.featured-map-tag{height:29px;display:flex;align-items:center;justify-content:center;gap:4px;border:2px solid #fff;border-radius:40px;background:#173c52;color:#fff;font-size:10px;white-space:nowrap;font-weight:850;box-shadow:0 4px 16px #10283db0;transform:translateY(-8px);cursor:pointer;transition:transform .16s}
+.featured-map-tag span{color:#f4d386;font-size:13px}
+.featured-map-tag:hover{transform:translateY(-10px) scale(1.06)}
+.summary-banner{display:flex;align-items:flex-start;gap:12px;background:#eaf3f7;border:1px solid #cee4ed;border-radius:12px;padding:16px;margin-top:16px;color:#266e89}
+.summary-banner>svg{flex-shrink:0;margin-top:2px}
+.summary-banner strong{display:block;font-size:13px;color:#245770}
+.summary-banner p{font-size:11px;line-height:1.8;margin:6px 0 0;color:#5f8192}
+.summary-next{border:1px solid #d9e7ec;border-radius:12px;padding:14px;margin-top:18px}
+.summary-next>span{font-size:12px;color:#256987;font-weight:850}
+.summary-next>p{font-size:11px;color:#6e8a9b;line-height:1.7}
+.summary-quick-actions{display:flex;gap:8px}
+.summary-quick-actions button{flex:1;background:#286e8c;color:#fff;border:0;border-radius:8px;padding:11px 5px;font-size:11px;font-weight:850;white-space:nowrap}
+.summary-quick-actions button:hover{background:#1f5872}
+.feature-tabs{grid-template-columns:repeat(4,1fr)}
+.feature-tabs button{font-size:10px;gap:3px;padding:10px 2px}
+/* Local image panorama simulating a field-level street-view workflow */
+.roadview-wrap{width:100%;min-width:0}
+.roadview-viewport{position:relative;height:238px;overflow:hidden;background:#94b59d;border-radius:11px;border:1px solid #d5e4e1;touch-action:pan-y;cursor:grab;user-select:none}
+.roadview-viewport:active{cursor:grabbing}
+.roadview-panorama{position:absolute;left:0;top:0;width:240%;height:100%;max-width:none;object-fit:fill;pointer-events:none;user-select:none;will-change:transform}
+.roadview-topbar{position:absolute;z-index:2;top:9px;left:9px;right:9px;display:flex;justify-content:space-between;align-items:center;gap:4px;pointer-events:none}
+.roadview-live,.roadview-compass{color:#fff;background:#172d3cba;padding:7px 8px;border-radius:5px;font-weight:850;font-size:10px;letter-spacing:.015em;backdrop-filter:blur(3px)}
+.roadview-live span{display:inline-block;background:#ff6e65;border-radius:50%;width:7px;height:7px;margin-right:5px}
+.roadview-compass{font-variant-numeric:tabular-nums}
+.roadview-target{position:absolute;right:9%;top:43%;width:24%;height:33%;border:2px dashed #fff;background:#e45a2638;border-radius:10px;box-shadow:0 0 0 1px #bc40276b,0 0 22px #ffb76580;pointer-events:none;display:flex;align-items:flex-end;justify-content:center;transition:opacity .2s}
+.roadview-target span{white-space:nowrap;font-size:9px;color:#fff;font-weight:850;background:#bd5039e6;padding:5px;border-radius:4px;transform:translateY(10px)}
+.roadview-hint{position:absolute;z-index:3;top:50%;left:50%;transform:translate(-50%,-50%);background:#112d40c7;color:#fff;border:1px solid #ffffff44;border-radius:22px;padding:8px 8px 8px 13px;white-space:nowrap;font-size:10px;box-shadow:0 5px 12px #203c4440;pointer-events:none}
+.roadview-hint button{border:0;background:#ffffff2a;border-radius:50%;color:#fff;font-weight:850;margin-left:7px;width:18px;height:18px;pointer-events:auto}
+.roadview-watermark{position:absolute;right:8px;bottom:7px;z-index:2;color:#fff;font-size:9px;font-weight:850;text-shadow:0 1px 5px #172d39;background:#172c3388;padding:4px 6px;border-radius:4px;pointer-events:none}
+.roadview-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f4f7f8;border:1px solid #dfe8ec;border-radius:9px;padding:8px;margin-top:10px}
+.roadview-nav>button{width:38px;height:33px;border:1px solid #cbdfe5;border-radius:7px;color:#256985;background:#fff;font-size:12px}
+.roadview-nav>button:hover{background:#def0f5}
+.roadview-nav-center{display:flex;align-items:center;flex-direction:column;gap:3px;text-align:center}
+.roadview-nav-center strong{color:#365b70;font-size:11px}
+.roadview-nav-center span{color:#9baeb9;font-size:9px}
+.roadview-highlight{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:750;color:#48768c;margin-top:12px}
+.roadview-highlight input{accent-color:#3083a1}
+.roadview-notice{display:block;line-height:1.7;margin-top:12px}
+.roadview-notice b{color:#327b98}
+@media (max-width:790px){.roadview-viewport{height:220px}.featured-map-tag{font-size:9px}.all-region-select{font-size:11px}}
+@media (max-width:560px){.showcase-choices{gap:5px}.showcase-choices button{padding:9px 6px}.roadview-viewport{height:198px}.roadview-target{right:7%;width:30%}}

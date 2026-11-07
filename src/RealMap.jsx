@@ -5,9 +5,19 @@ import 'leaflet/dist/leaflet.css';
 
 // 모두 가상 필지 중심점입니다. 실제 위험도나 불법 성토의 공간 분포가 아닙니다.
 const AREAS = {
-  '전체': { center: [35.488, 129.198], zoom: 11 },
+  '전체': { center: [35.507, 129.193], zoom: 10 },
   '삼남읍': { center: [35.557, 129.117], zoom: 13 },
   '온양읍': { center: [35.420, 129.281], zoom: 13 },
+  '범서읍': { center: [35.570, 129.234], zoom: 13 },
+  '언양읍': { center: [35.579, 129.140], zoom: 13 },
+  '온산읍': { center: [35.448, 129.326], zoom: 13 },
+  '청량읍': { center: [35.495, 129.280], zoom: 13 },
+  '웅촌면': { center: [35.460, 129.211], zoom: 13 },
+  '서생면': { center: [35.350, 129.320], zoom: 13 },
+  '상북면': { center: [35.607, 129.078], zoom: 13 },
+  '두동면': { center: [35.667, 129.205], zoom: 13 },
+  '두서면': { center: [35.654, 129.099], zoom: 13 },
+  '삼동면': { center: [35.517, 129.170], zoom: 13 },
 };
 
 const HOTSPOT_PALETTE = {
@@ -35,7 +45,7 @@ const HOTSPOT_PALETTE = {
 function MapMove({ region, selected }) {
   const map = useMap();
   useEffect(() => {
-    const target = selected ? { center: [selected.lat, selected.lng], zoom: 15 } : AREAS[region];
+    const target = selected ? { center: [selected.lat, selected.lng], zoom: 14 } : AREAS[region];
     if (target) map.flyTo(target.center, target.zoom, { animate: true, duration: 0.75 });
   }, [map, region, selected]);
   return null;
@@ -78,8 +88,8 @@ function HotspotCanvas({ parcels }) {
       context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
       context.clearRect(0, 0, size.x, size.y);
 
-      const screenRadius = Math.max(58, Math.min(100, size.x * 0.077));
-      const zoomFactor = Math.max(0.87, Math.min(1.15, 0.87 + (map.getZoom() - 11) * 0.08));
+      const screenRadius = Math.max(47, Math.min(82, size.x * 0.066));
+      const zoomFactor = Math.max(0.85, Math.min(1.18, 0.88 + (map.getZoom() - 10) * 0.07));
       const order = { low: 0, medium: 1, high: 2 };
       [...parcels].sort((a, b) => order[a.riskKey] - order[b.riskKey]).forEach((parcel) => {
         const point = map.latLngToContainerPoint([parcel.lat, parcel.lng]);
@@ -133,7 +143,7 @@ function HotspotInteraction({ parcels, onSelect }) {
         const delta = center.distanceTo(pointer);
         if (delta < distance) { nearest = parcel; distance = delta; }
       });
-      return distance <= 93 ? nearest : null;
+      return distance <= 85 ? nearest : null;
     }
 
     function handleClick(event) {
@@ -195,14 +205,17 @@ export default function RealMap({ parcels, selected, region, onSelect, baseLayer
     ? 'Map imagery © VWorld'
     : '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>';
   const markers = useMemo(() => parcels.map(parcel => ({ parcel, icon: createMarker(parcel, selected?.id === parcel.id) })), [parcels, selected]);
+  const featured = useMemo(() => parcels.filter(parcel => parcel.featured), [parcels]);
+  const featureIcon = useMemo(() => L.divIcon({className: 'featured-marker-shell', html: '<div class="featured-map-tag"><span>★</span> 상세 시연</div>', iconSize: [94, 30], iconAnchor: [47, 15]}), []);
 
   return (
-    <MapContainer center={AREAS['전체'].center} zoom={11} className="gis-map" zoomControl={true} scrollWheelZoom={true} preferCanvas={true}>
+    <MapContainer center={AREAS['전체'].center} zoom={10} className="gis-map" zoomControl={true} scrollWheelZoom={true} preferCanvas={true}>
       <TileLayer key={baseLayer === 'satellite' && keyAvailable ? 'satellite' : 'osm'} url={tileUrl} attribution={attribution} maxZoom={19}/>
       <MapMove region={region} selected={selected}/>
       {mapMode === 'heat' ? <>
         <HotspotCanvas parcels={parcels}/>
         <HotspotInteraction parcels={parcels} onSelect={onSelect}/>
+        {featured.map(parcel => <Marker key={`featured-${parcel.id}`} position={[parcel.lat, parcel.lng]} icon={featureIcon} bubblingMouseEvents={false} eventHandlers={{ click: () => onSelect(parcel.id) }}><Tooltip direction="top" opacity={0.96}>{parcel.region} {parcel.name} · 상세 시연 가능</Tooltip></Marker>)}
         {selected && <>
           <CircleMarker center={[selected.lat, selected.lng]} radius={20} pathOptions={{ color: '#ffffff', weight: 3, fillOpacity: 0, dashArray: '5 5' }} interactive={false}/>
           <CircleMarker center={[selected.lat, selected.lng]} radius={6} pathOptions={{ color: '#ffffff', weight: 2, fillColor: '#cb3348', fillOpacity: 0.95 }} interactive={false}/>
