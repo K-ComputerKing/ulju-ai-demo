@@ -125,6 +125,7 @@ export default function App() {
   const [keyword, setKeyword] = useState('');
   const [selectedId, setSelectedId] = useState(null);
   const [baseLayer, setBaseLayer] = useState('street');
+  const [mapMode, setMapMode] = useState('heat');
   const [showGuide, setShowGuide] = useState(false);
   const [showPanel, setShowPanel] = useState(true);
   const [statusOverrides, setStatusOverrides] = useState({});
@@ -158,14 +159,14 @@ export default function App() {
 
   return (
     <div className="fullscreen-app">
-      <div className="map-background"><RealMap parcels={visibleParcels} selected={selected} region={region} onSelect={handleSelectParcel} baseLayer={baseLayer} apiKey={key} /></div>
+      <div className="map-background"><RealMap parcels={visibleParcels} selected={selected} region={region} onSelect={handleSelectParcel} baseLayer={baseLayer} apiKey={key} mapMode={mapMode} /></div>
 
       <header className="app-header">
         <div className="product-brand"><span className="brand-logo"><Icon name="map" size={25}/></span><div><strong>울주 AI 농지변화 모니터링</strong><small>ULJU SMART FIELD · 정책연구 시연</small></div></div>
         <nav className="header-actions" aria-label="서비스 메뉴"><span className="demo-mark">DEMO · 가상 데이터</span><button className="header-help" onClick={() => setShowGuide(true)}><Icon name="help" size={17}/> 시연 안내</button></nav>
       </header>
 
-      <div className="floating-toolbar" aria-label="지도 선택"><button className={baseLayer==='street' ? 'active' : ''} onClick={() => handleLayer('street')}><Icon name="map" size={16}/> 일반지도</button><button className={baseLayer==='satellite' ? 'active' : ''} onClick={() => handleLayer('satellite')} title={key ? 'VWorld 항공영상 전환' : 'VWorld API 키가 필요한 기능'}><Icon name="layers" size={16}/> 항공영상{!key && <span className="lock-hint">키 필요</span>}</button></div>
+      <div className="floating-toolbar" aria-label="지도 선택"><button className={baseLayer==='street' ? 'active' : ''} onClick={() => handleLayer('street')}><Icon name="map" size={16}/> 일반지도</button><button className={baseLayer==='satellite' ? 'active' : ''} onClick={() => handleLayer('satellite')} title={key ? 'VWorld 항공영상 전환' : 'VWorld API 키가 필요한 기능'}><Icon name="layers" size={16}/> 항공영상{!key && <span className="lock-hint">키 필요</span>}</button><span className="toolbar-separator"/><button className={mapMode==='heat' ? 'active heat-active' : ''} onClick={() => setMapMode('heat')}><Icon name="chart" size={16}/> 핫스팟</button><button className={mapMode==='pins' ? 'active' : ''} onClick={() => setMapMode('pins')}><Icon name="pin" size={16}/> 필지 핀</button></div>
 
       {!showPanel && <button className="panel-restore" onClick={() => setShowPanel(true)} aria-label="필지 목록 열기"><Icon name="search" size={18}/> 필지 목록 열기</button>}
       {showPanel && <aside className="left-panel">
@@ -180,15 +181,16 @@ export default function App() {
           <div className="list-title"><strong>변화 의심 후보</strong><span>{visibleParcels.length}건 · 가상 사례</span></div>
           <div className="parcel-list">{visibleParcels.map(parcel => <button key={parcel.id} className={`parcel-item ${selectedId === parcel.id ? 'selected' : ''}`} onClick={() => handleSelectParcel(parcel.id)}><span className={`parcel-marker-dot ${parcel.riskKey}`}/><span className="parcel-item-main"><strong>{parcel.region} {parcel.name}</strong><small>{parcel.id} · {statusOverrides[parcel.id] || parcel.status}</small></span><span className="parcel-item-side"><RiskPill parcel={parcel}/><small>변화 {parcel.change}%</small></span></button>)}{visibleParcels.length===0 && <div className="no-result">조건에 해당하는 가상 필지가 없습니다.</div>}</div>
         </div>
-        <div className="left-panel-foot"><Icon name="info" size={16}/><span>지도 배경은 실제 지도, 마커·필지 정보는 가상 시연 자료입니다.</span></div>
+        <div className="left-panel-foot"><Icon name="info" size={16}/><span>실제 지도 위에 가상 필지 6건의 우선순위를 색상으로 표현했습니다. 실측 위험도 분석이 아닙니다.</span></div>
       </aside>}
 
-      {!selected && <div className="welcome-float"><span className="welcome-icon"><Icon name="compass" size={20}/></span><div><strong>지도에서 의심지역을 선택하세요</strong><small>마커를 누르면 영상비교·AI 요약·점검관리가 열립니다.</small></div></div>}
+      {!selected && <div className="welcome-float"><span className="welcome-icon"><Icon name="compass" size={20}/></span><div><strong>지도의 색상 영역을 클릭해 보세요</strong><small>붉은색일수록 높은 모의 우선순위 · 클릭하면 상세 분석 패널</small></div></div>}
       {selected && <ParcelDetail key={selected.id} parcel={selected} status={statusOverrides[selected.id] || selected.status} onStatusUpdate={handleChangeStatus} onClose={() => setSelectedId(null)} onOpenGuide={() => setShowGuide(true)}/>}
-      <div className="map-disclaimer"><Icon name="info" size={15}/> 시연 화면 · 2D 영상으로 불법 여부·성토 높이 확정 불가 · 스카이뷰 미연계</div>
+      {mapMode === 'heat' && !selected && <div className="hotspot-legend"><div className="hotspot-legend-head"><b>농지변화 핫스팟</b><span>DEMO</span></div><div className="hotspot-gradient"/><div className="hotspot-legend-labels"><span>낮음</span><span>보통</span><span>높음</span></div><p>6개 가상 필지의 모의 우선순위 표시<br/>실제 위험도·불법성토 분석 결과 아님</p></div>}
+      <div className="map-disclaimer"><Icon name="info" size={15}/> 시연 화면 · 가상 위험도 분포 · 2D 영상으로 불법 여부·성토 높이 확정 불가 · 스카이뷰 미연계</div>
       {message && <div className="toast"><Icon name="info" size={16}/>{message}<button onClick={() => setMessage('')} aria-label="알림 닫기">×</button></div>}
 
-      {showGuide && <div className="dialog-overlay" onClick={() => setShowGuide(false)}><div className="guide-dialog" role="dialog" aria-modal="true" aria-label="발표용 시연 안내" onClick={e => e.stopPropagation()}><button className="icon-button guide-x" onClick={() => setShowGuide(false)} aria-label="닫기"><Icon name="close" size={19}/></button><span className="guide-eyebrow">2026 정책연구단 · 프로일잘러의 업무혁신</span><h2>3분 시연 순서</h2><ol><li>왼쪽에서 <b>삼남읍</b> 선택 → 실제 지도가 해당 지역으로 이동</li><li>지도 마커 또는 목록의 <b>시연 필지 A</b> 선택</li><li>오른쪽 패널에서 <b>전후영상 슬라이더</b> 이동</li><li><b>모의 AI 분석 결과 보기</b> → 체크리스트 확인</li><li><b>점검보고서 초안</b> 및 시연용 상태 변경</li></ol><div className="guide-warning"><Icon name="warning" size={18}/><span>실제 영상·허가·민원 DB, AI 모델, 울주 스카이맵·스카이뷰는 연결되지 않았습니다. 필지 위치 및 분석값은 모두 가상입니다.</span></div><button className="action-primary" onClick={() => setShowGuide(false)}>시연 시작하기 <Icon name="arrow" size={17}/></button></div></div>}
+      {showGuide && <div className="dialog-overlay" onClick={() => setShowGuide(false)}><div className="guide-dialog" role="dialog" aria-modal="true" aria-label="발표용 시연 안내" onClick={e => e.stopPropagation()}><button className="icon-button guide-x" onClick={() => setShowGuide(false)} aria-label="닫기"><Icon name="close" size={19}/></button><span className="guide-eyebrow">2026 정책연구단 · 프로일잘러의 업무혁신</span><h2>3분 시연 순서</h2><ol><li>왼쪽에서 <b>삼남읍</b> 선택 → 실제 지도가 해당 지역으로 이동</li><li>지도에서 <b>붉은 핫스팟</b>을 클릭하거나 목록의 <b>시연 필지 A</b> 선택</li><li>오른쪽 패널에서 <b>전후영상 슬라이더</b> 이동</li><li><b>모의 AI 분석 결과 보기</b> → 체크리스트 확인</li><li><b>점검보고서 초안</b> 및 시연용 상태 변경</li></ol><div className="guide-warning"><Icon name="warning" size={18}/><span>실제 영상·허가·민원 DB, AI 모델, 울주 스카이맵·스카이뷰는 연결되지 않았습니다. 필지 위치 및 분석값은 모두 가상입니다.</span></div><button className="action-primary" onClick={() => setShowGuide(false)}>시연 시작하기 <Icon name="arrow" size={17}/></button></div></div>}
     </div>
   );
 }

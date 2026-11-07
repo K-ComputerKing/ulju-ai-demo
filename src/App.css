@@ -9,3 +9,16 @@
 @media(max-width:1120px){.left-panel{width:305px}.detail-drawer{width:365px}.product-brand strong{font-size:15px}.welcome-float{max-width:320px}}
 @media(max-width:790px){.app-header{height:60px;padding:0 13px}.product-brand strong{font-size:12px}.product-brand small{font-size:8px}.brand-logo{width:33px;height:33px}.demo-mark{display:none}.floating-toolbar{top:71px;right:10px}.floating-toolbar button{padding:7px 9px;font-size:10px}.left-panel{left:10px;top:120px;bottom:62px;width:min(315px,calc(100vw - 20px))}.detail-drawer{right:10px;top:115px;bottom:60px;width:min(365px,calc(100vw - 20px))}.welcome-float{display:none}.map-disclaimer{left:10px;bottom:12px;transform:none;max-width:calc(100vw - 20px);white-space:normal;font-size:9px}.panel-restore{top:115px;left:10px}.leaflet-control-zoom{margin-bottom:62px!important}.map-disclaimer{pointer-events:none}}
 @media(max-width:560px){.header-help{font-size:0;gap:0;padding:8px}.header-help svg{width:19px}.product-brand strong{font-size:11px}.left-panel{width:285px}.detail-drawer{left:10px;right:10px;width:auto;top:110px;bottom:58px}.floating-toolbar{right:8px}.lock-hint{display:none}}
+
+/* Hotspot Map: 투명한 지도 캔버스 + 별도 시각화 컨트롤 */
+.gis-hotspot-canvas{pointer-events:none!important;opacity:.95;mix-blend-mode:normal}
+.floating-toolbar .toolbar-separator{display:block;align-self:stretch;width:1px;background:#e2e9ec;margin:5px 3px}
+.floating-toolbar button.heat-active{background:linear-gradient(135deg,#a8344a,#d45643);color:#fff}
+.hotspot-legend{position:absolute;right:22px;bottom:84px;z-index:620;min-width:223px;background:#ffffffef;border:1px solid #e6eaed;border-radius:13px;padding:15px 16px 12px;box-shadow:0 12px 28px #122c4632;backdrop-filter:blur(7px)}
+.hotspot-legend-head{display:flex;justify-content:space-between;align-items:center;color:#263f52;font-size:12px}
+.hotspot-legend-head span{padding:3px 6px;border-radius:5px;font-size:9px;font-weight:850;color:#a14b4b;background:#fcece8;letter-spacing:.05em}
+.hotspot-gradient{height:11px;border-radius:10px;margin:12px 0 7px;background:linear-gradient(90deg,#39b59a 0%,#b5d790 29%,#f5c35d 58%,#ed7951 78%,#c92c45 100%);box-shadow:inset 0 0 0 1px #ffffffa0}
+.hotspot-legend-labels{display:flex;justify-content:space-between;color:#738694;font-size:10px;font-weight:750}
+.hotspot-legend p{border-top:1px solid #e8edf0;margin:11px 0 0;padding-top:9px;color:#82929e;font-size:10px;line-height:1.5}
+@media(max-width:790px){.hotspot-legend{right:10px;bottom:70px;padding:11px 12px;min-width:185px}.floating-toolbar{gap:2px}.floating-toolbar button{padding:7px 8px}}
+@media(max-width:560px){.hotspot-legend{display:none}.floating-toolbar{max-width:calc(100vw - 16px);right:8px;overflow-x:auto;scrollbar-width:none}.floating-toolbar::-webkit-scrollbar{display:none}.floating-toolbar button{font-size:10px;padding:7px 6px}.floating-toolbar .toolbar-separator{margin:5px 0}.floating-toolbar button svg{width:13px;height:13px}}
