@@ -79,3 +79,33 @@
 .roadview-notice b{color:#327b98}
 @media (max-width:790px){.roadview-viewport{height:220px}.featured-map-tag{font-size:9px}.all-region-select{font-size:11px}}
 @media (max-width:560px){.showcase-choices{gap:5px}.showcase-choices button{padding:9px 6px}.roadview-viewport{height:198px}.roadview-target{right:7%;width:30%}}
+
+/* 격자형 스펙트럼 위험도 지도 - 사용자가 첨부한 블록형 히트맵 참고 */
+.hotspot-gradient {
+  background:linear-gradient(90deg,#1b48a6 0%,#408bdb 22%,#b9dae1 40%,#f4e4b2 53%,#f6a17d 70%,#cb353e 100%);
+  border:1px solid #e2e7ed;
+  box-shadow:inset 0 0 0 1px #ffffff4d;
+}
+.gis-hotspot-canvas{opacity:1;image-rendering:auto;pointer-events:none!important}
+@media(max-width:950px){.floating-toolbar button{gap:4px}}
+
+/* 원형 클러스터 뷰: 사진 참고. 색상은 모의 우선순위 구성, 중앙 숫자는 후보 수 */
+.cluster-icon-shell{border:0!important;background:transparent!important}
+.cluster-bubble{position:relative;width:var(--cluster-size);height:var(--cluster-size);border-radius:50%;padding:7px;display:grid;place-items:center;background:var(--cluster-ring);box-shadow:0 5px 17px #16384b4d,0 0 0 2px #ffffffaf;transition:filter .15s ease,transform .15s ease;cursor:pointer}
+.cluster-bubble:hover{filter:brightness(1.07);transform:scale(1.07)}
+.cluster-bubble::before{position:absolute;content:'';inset:-7px;border-radius:50%;background:#ed94c436;z-index:-1}
+.cluster-bubble.contains-featured{box-shadow:0 5px 18px #16384b66,0 0 0 3px #ffffffd9,0 0 0 8px #ffcf7180}
+.cluster-bubble-inner{width:100%;height:100%;border-radius:50%;background:#ffffffed;border:2px solid #ffffffb8;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#263c4b;line-height:1.05}
+.cluster-bubble-inner b{font-variant-numeric:tabular-nums;font-size:clamp(17px,1.6vw,23px);font-weight:900;letter-spacing:-.04em}
+.cluster-bubble-inner small{font-size:9px;color:#79909d;font-weight:800;margin-top:4px}
+.cluster-featured-star{position:absolute;top:-10px;right:-9px;width:25px;height:25px;border:2px solid #fff;border-radius:50%;display:grid;place-items:center;background:#193f58;color:#ffd67f;font-size:14px;box-shadow:0 2px 9px #12324e44}
+.cluster-legend{position:absolute;z-index:650;right:22px;bottom:78px;border:1px solid #e4eaf0;background:#ffffffed;box-shadow:0 9px 28px #18364a2b;backdrop-filter:blur(6px);border-radius:13px;width:245px;padding:14px 16px;color:#37566a;pointer-events:none}
+.cluster-legend>strong{font-size:12px;color:#284b63;display:flex;align-items:center;justify-content:space-between}
+.cluster-legend>strong small{font-size:9px;border-radius:4px;padding:3px 6px;color:#af6d8d;background:#fff1f8}
+.cluster-legend-rings{display:flex;justify-content:space-around;margin:13px 0 9px;gap:4px}
+.cluster-legend-ring{display:grid;place-items:center;width:61px;height:61px;border-radius:50%;border:7px solid #f07770;background:#ffffffcc;color:#566e7b;font-size:10px;font-weight:850}
+.cluster-legend-ring.pink{border-color:#df77d3}.cluster-legend-ring.blue{border-color:#5dbcc8}
+.cluster-legend p{font-size:10px;line-height:1.7;color:#7b8e9b;margin:6px 0 0}.cluster-legend p b{color:#42758c}
+.floating-toolbar{flex-wrap:wrap;max-width:calc(100vw - 40px);justify-content:flex-end}
+@media(max-width:790px){.floating-toolbar{max-width:calc(100vw - 18px);top:67px;right:9px}.floating-toolbar button{padding:7px 8px}.left-panel{top:166px}.panel-restore{top:165px}.detail-drawer{top:164px}.cluster-legend{right:11px;bottom:51px;width:210px;padding:10px}.cluster-legend-ring{width:49px;height:49px;border-width:6px}}
+@media(max-width:560px){.floating-toolbar{top:65px}.floating-toolbar button{font-size:10px;padding:6px 8px}.left-panel{top:155px}.panel-restore{top:154px}.detail-drawer{top:155px}.cluster-legend{right:10px;bottom:44px;width:188px}.cluster-legend-ring{width:44px;height:44px;border-width:5px;font-size:9px}}

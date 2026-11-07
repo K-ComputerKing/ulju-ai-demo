@@ -176,7 +176,7 @@ export default function App() {
   const [keyword, setKeyword] = useState('');
   const [selectedId, setSelectedId] = useState(null);
   const [baseLayer, setBaseLayer] = useState('street');
-  const [mapMode, setMapMode] = useState('heat');
+  const [mapMode, setMapMode] = useState('cluster');
   const [showGuide, setShowGuide] = useState(false);
   const [showPanel, setShowPanel] = useState(true);
   const [statusOverrides, setStatusOverrides] = useState({});
@@ -218,7 +218,7 @@ export default function App() {
         <nav className="header-actions" aria-label="서비스 메뉴"><span className="demo-mark">DEMO · 가상 데이터</span><button className="header-help" onClick={() => setShowGuide(true)}><Icon name="help" size={17}/> 시연 안내</button></nav>
       </header>
 
-      <div className="floating-toolbar" aria-label="지도 선택"><button className={baseLayer==='street' ? 'active' : ''} onClick={() => handleLayer('street')}><Icon name="map" size={16}/> 일반지도</button><button className={baseLayer==='satellite' ? 'active' : ''} onClick={() => handleLayer('satellite')} title={key ? 'VWorld 항공영상 전환' : 'VWorld API 키가 필요한 기능'}><Icon name="layers" size={16}/> 항공영상{!key && <span className="lock-hint">키 필요</span>}</button><span className="toolbar-separator"/><button className={mapMode==='heat' ? 'active heat-active' : ''} onClick={() => setMapMode('heat')}><Icon name="chart" size={16}/> 핫스팟</button><button className={mapMode==='pins' ? 'active' : ''} onClick={() => setMapMode('pins')}><Icon name="pin" size={16}/> 필지 핀</button></div>
+      <div className="floating-toolbar" aria-label="지도 선택"><button className={baseLayer==='street' ? 'active' : ''} onClick={() => handleLayer('street')}><Icon name="map" size={16}/> 일반지도</button><button className={baseLayer==='satellite' ? 'active' : ''} onClick={() => handleLayer('satellite')} title={key ? 'VWorld 항공영상 전환' : 'VWorld API 키가 필요한 기능'}><Icon name="layers" size={16}/> 항공영상{!key && <span className="lock-hint">키 필요</span>}</button><span className="toolbar-separator"/><button className={mapMode==='heat' ? 'active heat-active' : ''} onClick={() => setMapMode('heat')}><Icon name="chart" size={16}/> 격자 히트맵</button><button className={mapMode==='cluster' ? 'active cluster-active' : ''} onClick={() => setMapMode('cluster')}><Icon name="layers" size={16}/> 원형 클러스터</button><button className={mapMode==='pins' ? 'active' : ''} onClick={() => setMapMode('pins')}><Icon name="pin" size={16}/> 필지 핀</button></div>
 
       {!showPanel && <button className="panel-restore" onClick={() => setShowPanel(true)} aria-label="필지 목록 열기"><Icon name="search" size={18}/> 필지 목록 열기</button>}
       {showPanel && <aside className="left-panel">
@@ -240,16 +240,17 @@ export default function App() {
         <div className="left-panel-foot"><Icon name="info" size={16}/><span>전역 30개 가상 좌표의 분포입니다. 상세 시연은 대표 2곳만 제공됩니다.</span></div>
       </aside>}
 
-      {!selected && <div className="welcome-float"><span className="welcome-icon"><Icon name="compass" size={20}/></span><div><strong>지도의 색상 영역을 클릭해 보세요</strong><small>전역 30곳은 기본 조회 · ★ 표시는 대표 상세 시연 2곳</small></div></div>}
+      {!selected && <div className="welcome-float"><span className="welcome-icon"><Icon name="compass" size={20}/></span><div><strong>{mapMode === 'cluster' ? '원 안의 숫자를 눌러 확대해 보세요' : '지도에서 가상 후보를 선택해 보세요'}</strong><small>30개 가상 후보 중 대표 2곳만 상세 시연을 제공합니다.</small></div></div>}
       {selected && (selected.featured
         ? <ParcelDetail key={selected.id} parcel={selected} status={statusOverrides[selected.id] || selected.status} onStatusUpdate={handleChangeStatus} onClose={() => setSelectedId(null)} onOpenGuide={() => setShowGuide(true)}/>
         : <SpotSummary key={selected.id} parcel={selected} onClose={() => setSelectedId(null)} onShowcase={handleShowcase}/>
       )}
-      {mapMode === 'heat' && !selected && <div className="hotspot-legend"><div className="hotspot-legend-head"><b>농지변화 핫스팟</b><span>DEMO</span></div><div className="hotspot-gradient"/><div className="hotspot-legend-labels"><span>낮음</span><span>보통</span><span>높음</span></div><p>12개 읍·면 / 30개 가상 후보의 색상 분포<br/>실제 위험도·불법성토 분석 결과 아님</p></div>}
-      <div className="map-disclaimer"><Icon name="info" size={15}/> 시연 화면 · 가상 위험도 분포 · 2D 영상으로 불법 여부·성토 높이 확정 불가 · 스카이뷰 미연계</div>
+      {mapMode === 'cluster' && !selected && <div className="cluster-legend" aria-label="원형 클러스터 사용 안내"><strong>원형 클러스터 지도 <small>DEMO</small></strong><div className="cluster-legend-rings"><span className="cluster-legend-ring red">고우선</span><span className="cluster-legend-ring pink">보통</span><span className="cluster-legend-ring blue">낮음</span></div><p><b>숫자 = 묶인 가상 후보 개수</b><br/>클릭해 확대하면 후보가 개별 표시됩니다.<br/>★ 표시에는 대표 상세 사례가 포함됩니다.</p></div>}
+      {mapMode === 'heat' && !selected && <div className="hotspot-legend"><div className="hotspot-legend-head"><b>농지변화 격자 히트맵</b><span>DEMO</span></div><div className="hotspot-gradient"/><div className="hotspot-legend-labels"><span>낮음</span><span>보통</span><span>높음</span></div><p>가상 후보 30곳의 위험도를 격자 색상으로 표현<br/>실제 통계·AI 탐지·행정구역 경계가 아님</p></div>}
+      <div className="map-disclaimer"><Icon name="info" size={15}/> 시연 화면 · 원 안의 수는 가상 후보 개수 · 격자는 가상 위험도 · 2D 영상만으로 위법 여부 판단 불가 · 스카이뷰 미연계</div>
       {message && <div className="toast"><Icon name="info" size={16}/>{message}<button onClick={() => setMessage('')} aria-label="알림 닫기">×</button></div>}
 
-      {showGuide && <div className="dialog-overlay" onClick={() => setShowGuide(false)}><div className="guide-dialog" role="dialog" aria-modal="true" aria-label="발표용 시연 안내" onClick={e => e.stopPropagation()}><button className="icon-button guide-x" onClick={() => setShowGuide(false)} aria-label="닫기"><Icon name="close" size={19}/></button><span className="guide-eyebrow">2026 정책연구단 · 프로일잘러의 업무혁신</span><h2>3분 시연 순서</h2><ol><li><b>울주군 전체 지도</b>에서 12개 읍·면의 30개 가상 핫스팟 분포 확인</li><li>일반 핫스팟을 눌러 <b>기본 요약</b>만 열리는 모습 시연</li><li>왼쪽 <b>대표 상세 시연</b>에서 삼남읍 또는 온양읍 선택</li><li><b>현장뷰</b> 좌우 이동 → <b>전후영상 슬라이더</b> 비교</li><li><b>모의 AI 요약</b> → 점검 체크리스트 → 보고서 초안</li></ol><div className="guide-warning"><Icon name="warning" size={18}/><span>실제 영상·허가·민원 DB, AI 모델, 울주 스카이맵·스카이뷰는 연결되지 않았습니다. 필지 위치 및 분석값은 모두 가상입니다.</span></div><button className="action-primary" onClick={() => setShowGuide(false)}>시연 시작하기 <Icon name="arrow" size={17}/></button></div></div>}
+      {showGuide && <div className="dialog-overlay" onClick={() => setShowGuide(false)}><div className="guide-dialog" role="dialog" aria-modal="true" aria-label="발표용 시연 안내" onClick={e => e.stopPropagation()}><button className="icon-button guide-x" onClick={() => setShowGuide(false)} aria-label="닫기"><Icon name="close" size={19}/></button><span className="guide-eyebrow">2026 정책연구단 · 프로일잘러의 업무혁신</span><h2>3분 시연 순서</h2><ol><li><b>울주군 전체 지도</b>에서 12개 읍·면에 분포한 가상 원형 클러스터와 30개 후보 확인</li><li>일반 핫스팟을 눌러 <b>기본 요약</b>만 열리는 모습 시연</li><li>왼쪽 <b>대표 상세 시연</b>에서 삼남읍 또는 온양읍 선택</li><li><b>현장뷰</b> 좌우 이동 → <b>전후영상 슬라이더</b> 비교</li><li><b>모의 AI 요약</b> → 점검 체크리스트 → 보고서 초안</li></ol><div className="guide-warning"><Icon name="warning" size={18}/><span>실제 영상·허가·민원 DB, AI 모델, 울주 스카이맵·스카이뷰는 연결되지 않았습니다. 필지 위치 및 분석값은 모두 가상입니다.</span></div><button className="action-primary" onClick={() => setShowGuide(false)}>시연 시작하기 <Icon name="arrow" size={17}/></button></div></div>}
     </div>
   );
 }
